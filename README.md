@@ -1,4 +1,4 @@
-# DocuBot
+## TF Summary
 
 This thinker helps  students understand that RAG OR CHatbots is a pipeline, not a single function: the system it shows that system has tokens, builds an index, scores  documents, and then ranks results. 
 
@@ -7,6 +7,9 @@ The biggest hurdle is  seeing how those three small methods depend on one anothe
 AI was helpful for reasoning through understanind docs files and the role each part playing in RAG pipeline. AI was not misleading during this tinker, I was mainly using it for understanding and not building . 
 
 To guide a student without giving away the answer, I would ask them to trace one sample query by hand and explain to me how the system is moving, which documents should be candidates, and why one result should score higher than another.
+
+
+## Doc Bot
 
 DocuBot is a small documentation assistant that helps answer developer questions about a codebase.  
 It can operate in three different modes:
