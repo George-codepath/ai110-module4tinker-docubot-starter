@@ -9,6 +9,7 @@ Core DocuBot class responsible for:
 
 import os
 import glob
+import string
 
 class DocuBot:
     def __init__(self, docs_folder="docs", llm_client=None):
@@ -48,6 +49,13 @@ class DocuBot:
     # Index Construction (Phase 1)
     # -----------------------------------------------------------
 
+    def _tokenize(self, text):
+        """
+        Lowercase text, remove basic punctuation, and split into words.
+        """
+        cleaned = text.lower().translate(str.maketrans("", "", string.punctuation))
+        return cleaned.split()
+
     def build_index(self, documents):
         """
         TODO (Phase 1):
@@ -64,7 +72,10 @@ class DocuBot:
         ignore punctuation if needed.
         """
         index = {}
-        # TODO: implement simple indexing
+        for filename, text in documents:
+            seen_tokens = set(self._tokenize(text))
+            for token in seen_tokens:
+                index.setdefault(token, []).append(filename)
         return index
 
     # -----------------------------------------------------------
@@ -81,8 +92,15 @@ class DocuBot:
         - Count how many appear in the text
         - Return the count as the score
         """
-        # TODO: implement scoring
-        return 0
+        query_tokens = self._tokenize(query)
+        document_tokens = set(self._tokenize(text))
+
+        score = 0
+        for token in query_tokens:
+            if token in document_tokens:
+                score += 1
+
+        return score
 
     def retrieve(self, query, top_k=3):
         """
@@ -91,9 +109,21 @@ class DocuBot:
 
         Return a list of (filename, text) sorted by score descending.
         """
+        candidate_filenames = set()
+        for token in self._tokenize(query):
+            candidate_filenames.update(self.index.get(token, []))
+
         results = []
-        # TODO: implement retrieval logic
-        return results[:top_k]
+        for filename, text in self.documents:
+            if filename not in candidate_filenames:
+                continue
+
+            score = self.score_document(query, text)
+            if score > 0:
+                results.append((score, filename, text))
+
+        results.sort(key=lambda item: item[0], reverse=True)
+        return [(filename, text) for score, filename, text in results[:top_k]]
 
     # -----------------------------------------------------------
     # Answering Modes
